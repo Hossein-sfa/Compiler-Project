@@ -12,7 +12,7 @@ Elif -> elif C : begin (Equation;)* end
 
 Else -> else : begin (Equation;)* end
 
-C -> Condition ((and | or) Condition)*
+C -> Expression ((and | or) Expression)*
 
 Loop -> loopc C : begin (Equation;)* end
 
@@ -32,4 +32,4 @@ Equation -> (ID) (Op) (Expression)
 
 CompOp -> (<= | >= | == | != | > | <)
 
-Final -> ID | Num | Expression
+Final -> ID | Num | (Expression)

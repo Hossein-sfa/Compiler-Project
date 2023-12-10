@@ -1,5 +1,6 @@
 #include "Parser.h"
 
+
 // main point is that the whole input has been consumed
 AST *Parser::parse()
 {
@@ -52,48 +53,6 @@ AST *Parser::parseGoal()
         }
     }
 }
-
-// AST *Parser::parseExpr()
-// {
-//     llvm::SmallVector<Expr *> exprs;
-//     while (!Tok.is(Token::semicolon))
-//     {
-//         switch (Tok.getKind())
-//         {
-//         case Token::KW_int:
-//             Expr *d;
-//             d = parseDec();   
-//             if (d)
-//                 exprs.push_back(d);
-//             else
-//                 goto _error2;
-//             break;
-//         case Token::ident:
-//             Expr *a;
-//             a = parseAssign();
-
-//             if (!Tok.is(Token::semicolon))
-//             {
-//                 error();
-//                 goto _error2;
-//             }
-//             if (a)
-//                 exprs.push_back(a);
-//             else
-//                 goto _error2;
-//             break;
-//         default:
-//             goto _error2;
-//             break;
-//         }
-//         advance(); // TODO: watch this part
-//     }
-//     return new GSM(exprs);
-// _error2:
-//     while (Tok.getKind() != Token::eoi)
-//         advance();
-//     return nullptr;
-// }
 
 Expr *Parser::parseDefine()
 {
@@ -162,28 +121,7 @@ Expr *Parser::parseCondition()
 
 Expr *Parser::parseIF()
 {
-    Expr *E1, *E2, *E3;
-    llvm::SmallVector<llvm::StringRef, 8> Vars;
-    if (!Tok.is(Token::begin))
-        goto _error;
-
-    advance();
-    E1 = parseEquation();
-
-    if (!expect(Token::end))
-        goto _error;
-
-    advance();
-
-    E2 = parseElif();
-    E3 = parseElse();
-
-    return new parseIF(E1, E2, E3);
-}
-
-Expr *Parser::parseIF()
-{
-    Expr *Else;
+    Expr *Else = nullptr;
     llvm::SmallVector<llvm::StringRef, 8> equations, elifs;
     if (!Tok.is(Token::begin))
         goto _error;
@@ -199,66 +137,154 @@ Expr *Parser::parseIF()
         advance();
     }
 
-    if (!expect(Token::elif))
-        goto _error;
-
     advance();
 
-    while (Tok.is(Token::comma))
+    while (!Tok.isOneOF(Token::eoi, Token::else))
     {
-        advance();
-        if (expect(Token::ident))
+        if (!expect(Token::elif))
             goto _error;
-        Vars.push_back(Tok.getText());
+        elifs.push_back(Tok.getText());
         advance();
     }
-    E2 = parseElif();
-    E3 = parseElse();
+
+    if (Tok.is(Token.else))
+    {
+        E3 = Tok.getText();
+    }
 
     return new IF(E1, E2, E3);
 }
 
-Expr *Parser::parseDec()
+Expr *Parser::parseElif()
+{
+    Expr *C;
+    llvm::SmallVector<llvm::StringRef, 8> equations;
+    if (!Tok.is(Token::elif))
+        goto _error;
+
+    advance();
+    while (!Tok.is(Token::colon))
+    {
+        advance();
+        if (!expect(Token::colon))
+            goto _error;
+        C= Tok.getText();
+        advance();
+    }
+
+    advance();
+    
+    if (!Tok.is(Token::begin))
+    {
+        goto _error;
+    }
+
+    advance();
+
+    while (!Tok.isOneOF(Token::end))
+    {
+        if (!expect(Token::id))
+            goto _error;
+        equations.push_back(Tok.getText());
+        advance();
+    }
+
+    return new ELIF(C, equations);
+}
+
+Expr *Parser::parseElse()
+{
+    llvm::SmallVector<llvm::StringRef, 8> equations;
+    if (!Tok.is(Token::else))
+        goto _error;
+
+    advance();
+
+    if (!Tok.is(Token::colon))
+        goto _error;
+
+    advance();
+
+    if (!Tok.is(Token::begin))
+        goto _error;
+
+    advance();
+
+    while (!Tok.is(Token::end))
+    {
+        if (!expect(Token::id))
+            goto _error;
+        equations.push_back(Tok.getText());
+        advance();
+    }
+
+    advance();
+    
+    if (!Tok.is(Token::eoi))
+    {
+        goto _error;
+    }
+    
+    return new Else(equations);
+}
+
+Expr *Parser::parseCompoundCondition()
 {
     Expr *E;
-    llvm::SmallVector<llvm::StringRef, 8> Vars;
-    if (!Tok.is(Token::KW_type))
+    if (!Tok.isOneOF(Token::num, Token::id))
         goto _error;
+    
+    E = parseExpression();
 
-    advance();
-    if (expect(Token::KW_int))
-        goto _error;
-
-    advance();
-
-    if (expect(Token::ident))
-        goto _error;
-    Vars.push_back(Tok.getText());
-    advance();
-
-    while (Tok.is(Token::comma))
+    while (Tok.isOneOf(Token::and, Token::or))
     {
         advance();
-        if (expect(Token::ident))
+        if (!expect(Token::id))
             goto _error;
-        Vars.push_back(Tok.getText());
+        equations.push_back(Tok.getText());
         advance();
     }
-
-    if (Tok.is(Token::equal))
+    
+    if (!Tok.is(Token::eoi))
     {
-        advance();
-        E = parseExpr();
+        goto _error;
     }
+    
+    return new CompoundCondition(equations);
+}
 
-    if (expect(Token::semicolon))
+Expr *Parser::parseLoop()
+{
+    Expr *C;
+    llvm::SmallVector<llvm::StringRef, 8> equations;
+    if (!Tok.is(Token::loopc))
         goto _error;
 
-    return new Declaration(Vars, E);
-_error: // TODO: Check this later in case of error :)
-    while (Tok.getKind() != Token::eoi)
+    advance();
+
+    C = parseCompoundCondition();
+    advance();
+
+    if (!Tok.is(Token::colon))
+        goto _error;
+
+    advance();
+
+    if (!Tok.is(Token::begin))
+        goto _error;
+
+    advance();
+
+    while (!Tok.is(Token::end))
+    {
+        equations.push_back(Tok.getText());
         advance();
-    return nullptr;
+        if (!expect(Token::semicolon))
+            goto _error;
+        advance();
+    }
+
+    return new Loop(C, equations);
 }
 
 Expr *Parser::parseAssign()
@@ -344,4 +370,60 @@ Expr *Parser::parseFinal()
         break;
     }
     return Res;
+}
+
+Expr *Parser::parseEquation()
+{
+    Expr *E;
+    if (!Tok.is(Token::id))
+        goto _error;
+
+    advance();
+
+    if (!Tok.isOneOf(Token::minus_equal, Token::mul_equal, Token::plus_equal, slash_equal, mod_equal, equal))
+        goto _error;
+        
+    advance();
+
+    if (Tok.is(Token::l_paren))
+    {
+        advance();
+        E = parseExpression();
+        if (!Tok.is(Token::r_paren))
+        {
+            goto _error;
+        }
+        advance();
+    }
+    else
+    {
+        goto _error;
+    }
+    
+    return Equation(E);
+}
+
+Expr *Parser::parseFinal()
+{
+    Expr *E;
+    if (Tok.is(Token::l_paren))
+    {
+        advance();
+        E = parseExpression();
+        if (!Tok.is(Token::r_paren))
+        {
+            goto _error;
+        }
+        advance();
+    } 
+    else if (Tok.isOneOf(Token::id, Token::number))
+    {
+        E = Tok.getText();
+    }
+    else
+    {
+        goto _error;
+    }
+    
+    return Equation(E);
 }
