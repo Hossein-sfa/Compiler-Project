@@ -9,50 +9,213 @@ AST *Parser::parse()
 
 AST *Parser::parseGoal()
 {
-    
-}
+    Expr *E;
+    llvm::SmallVector<llvm::StringRef, 8> Vars;
 
-AST *Parser::parseExpr()
-{
-    llvm::SmallVector<Expr *> exprs;
     while (!Tok.is(Token::eoi))
     {
-        switch (Tok.getKind())
+        if (Tok.is(Token::KW_int))
         {
-        case Token::KW_int:
             Expr *d;
-            d = parseDec();   
-            int b = c * d / 5;
+            d = parseDefine();   
             if (d)
                 exprs.push_back(d);
             else
                 goto _error2;
-            break;
-        case Token::ident:
-            Expr *a;
-            a = parseAssign();
-
-            if (!Tok.is(Token::semicolon))
-            {
-                error();
-                goto _error2;
-            }
-            if (a)
-                exprs.push_back(a);
+        } 
+        else if (Tok.is(Token::id))
+        {
+            Expr *d;
+            d = parseEquation();   
+            if (d)
+                exprs.push_back(d);
             else
                 goto _error2;
-            break;
-        default:
-            goto _error2;
-            break;
+        } 
+        else if (Tok.is(Token::if)) 
+        {
+            Expr *d;
+            d = parseIF();   
+            if (d)
+                exprs.push_back(d);
+            else
+                goto _error2;
+        } 
+        else if (Tok.is(Token::loopc))
+        {
+            Expr *d;
+            d = parseLoop();   
+            if (d)
+                exprs.push_back(d);
+            else
+                goto _error2;
         }
-        advance(); // TODO: watch this part
     }
-    return new GSM(exprs);
-_error2:
+}
+
+// AST *Parser::parseExpr()
+// {
+//     llvm::SmallVector<Expr *> exprs;
+//     while (!Tok.is(Token::semicolon))
+//     {
+//         switch (Tok.getKind())
+//         {
+//         case Token::KW_int:
+//             Expr *d;
+//             d = parseDec();   
+//             if (d)
+//                 exprs.push_back(d);
+//             else
+//                 goto _error2;
+//             break;
+//         case Token::ident:
+//             Expr *a;
+//             a = parseAssign();
+
+//             if (!Tok.is(Token::semicolon))
+//             {
+//                 error();
+//                 goto _error2;
+//             }
+//             if (a)
+//                 exprs.push_back(a);
+//             else
+//                 goto _error2;
+//             break;
+//         default:
+//             goto _error2;
+//             break;
+//         }
+//         advance(); // TODO: watch this part
+//     }
+//     return new GSM(exprs);
+// _error2:
+//     while (Tok.getKind() != Token::eoi)
+//         advance();
+//     return nullptr;
+// }
+
+Expr *Parser::parseDefine()
+{
+    Expr *E;
+    llvm::SmallVector<llvm::StringRef, 8> Vars;
+    if (!Tok.is(Token::KW_int))
+        goto _error;
+
+    advance();
+
+    if (expect(Token::id))
+        goto _error;
+    Vars.push_back(Tok.getText());
+    advance();
+
+    while (Tok.is(Token::comma))
+    {
+        advance();
+        if (expect(Token::id))
+            goto _error;
+        Vars.push_back(Tok.getText());
+        advance();
+    }
+
+    if (Tok.is(Token::equal))
+    {
+        advance();
+        E = parseExpression();
+    }
+
+    if (expect(Token::semicolon))
+        goto _error;
+
+    return new Equation(Vars, E);
+}
+
+Expr *Parser::parseCondition()
+{
+    Expr *E1, *E2, *_IF;
+    llvm::SmallVector<llvm::StringRef, 8> Vars;
+    if (!Tok.is(Token::if))
+        goto _error;
+
+    advance();
+    E1 = parseCondition();
+
+    if (!Tok.isOneOF(Token::not_equal,Token::gt,Token::lt,Token::gte,Token::lte, Token::is_equal))
+        goto _error;
+
+    advance();
+
+    E2 = parseCondition();
+
+    if (!Tok.is(Token::colon))
+        goto _error;
+
+    advance();
+
+    _IF = parseIF();
+
+    return new Condition(E1, E2, -IF);
     while (Tok.getKind() != Token::eoi)
         advance();
     return nullptr;
+}
+
+Expr *Parser::parseIF()
+{
+    Expr *E1, *E2, *E3;
+    llvm::SmallVector<llvm::StringRef, 8> Vars;
+    if (!Tok.is(Token::begin))
+        goto _error;
+
+    advance();
+    E1 = parseEquation();
+
+    if (!expect(Token::end))
+        goto _error;
+
+    advance();
+
+    E2 = parseElif();
+    E3 = parseElse();
+
+    return new parseIF(E1, E2, E3);
+}
+
+Expr *Parser::parseIF()
+{
+    Expr *Else;
+    llvm::SmallVector<llvm::StringRef, 8> equations, elifs;
+    if (!Tok.is(Token::begin))
+        goto _error;
+
+    advance();
+    while (!Tok.is(Token::end))
+    {
+        equations.push_back(Tok.getText());
+        advance();
+        if (!expect(Token::id))
+            goto _error;
+        equations.push_back(Tok.getText());
+        advance();
+    }
+
+    if (!expect(Token::elif))
+        goto _error;
+
+    advance();
+
+    while (Tok.is(Token::comma))
+    {
+        advance();
+        if (expect(Token::ident))
+            goto _error;
+        Vars.push_back(Tok.getText());
+        advance();
+    }
+    E2 = parseElif();
+    E3 = parseElse();
+
+    return new IF(E1, E2, E3);
 }
 
 Expr *Parser::parseDec()
