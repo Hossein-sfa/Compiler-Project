@@ -179,6 +179,7 @@ public:
     slash_equal,
     mod_equal,
     mul_equal,
+    equal,
   };
 
 private:

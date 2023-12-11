@@ -26,7 +26,7 @@ Factor -> Final((^)Final)*
 
 Num -> 0 | (1-9)((0-9))* | -(1-9)((0-9))* 
 
-Op -> -= | += | *= | \= |%= | =
+Op -> -= | += | *= | \= | %= | =
 
 Equation -> (ID) (Op) (Expression)
 

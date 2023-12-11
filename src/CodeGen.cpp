@@ -62,11 +62,35 @@ namespace
       }
     };
 
-    virtual void visit(Assignment &Node) override
+    virtual void visit(Equation &Node) override
     {
-      // Visit the right-hand side of the assignment and get its value.
+      // Visit the left-hand side of the binary operation and get its value.
+      Node.getLeft()->accept(*this);
+      Value *Left = V;
+
+      // Visit the right-hand side of the binary operation and get its value.
       Node.getRight()->accept(*this);
-      Value *val = V;
+      Value *Right = V;
+      {
+        case Equation::minus_equal:
+          V = Builder.CreateSDiv(Left, Right);
+          break;
+        case Equation::plus_equal:
+          V = Builder.CreateSDiv(Left, Right);
+          break;
+        case Equation::equal:
+          V = Builder.CreateSDiv(Left, Right);
+          break;
+        case Equation::mul_equal:
+          V = Builder.CreateSDiv(Left, Right);
+          break;
+        case Equation::slash_equal:
+          V = Builder.CreateSDiv(Left, Right);
+          break;
+        case Equation:: mod_equal:
+          V = Builder.CreateSDiv(Left, Right);
+          break;
+      }
 
       // Get the name of the variable being assigned.
       auto varName = Node.getLeft()->getVal();
@@ -84,9 +108,9 @@ namespace
       CallInst *Call = Builder.CreateCall(CalcWriteFnTy, CalcWriteFn, {val});
     };
 
-    virtual void visit(Factor &Node) override
+    virtual void visit(Final &Node) override
     {
-      if (Node.getKind() == Factor::Ident)
+      if (Node.getKind() == Final::Id)
       {
         // If the factor is an identifier, load its value from memory.
         V = Builder.CreateLoad(Int32Ty, nameMap[Node.getVal()]);
@@ -100,7 +124,7 @@ namespace
       }
     };
 
-    virtual void visit(BinaryOp &Node) override
+    virtual void visit(Expression &Node) override
     {
       // Visit the left-hand side of the binary operation and get its value.
       Node.getLeft()->accept(*this);
@@ -113,17 +137,27 @@ namespace
       // Perform the binary operation based on the operator type and create the corresponding instruction.
       switch (Node.getOperator())
       {
-      case BinaryOp::Plus:
+      case Equation::Plus:
         V = Builder.CreateNSWAdd(Left, Right);
         break;
-      case BinaryOp::Minus:
+      case Equation::Minus:
         V = Builder.CreateNSWSub(Left, Right);
         break;
-      case BinaryOp::Mul:
+      case Equation::Mul:
         V = Builder.CreateNSWMul(Left, Right);
         break;
-      case BinaryOp::Div:
+      case Equation::Div:
         V = Builder.CreateSDiv(Left, Right);
+        break;
+      case Equation:: power:
+        V=1;
+      for (int i = 0; i < Right.getVal().getAsInteger(10); i++)
+        V = Builder.CreateNSWMul(V,Left);
+        break;
+      case Equation:: mod:
+        V
+        int l=Right.getVal().getAsInteger(10)
+        V = Builder.(Left, Right);
         break;
       }
     };
