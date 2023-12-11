@@ -47,14 +47,13 @@ class Parser
     AST *parseGoal();
     Expr *parseStatement();
     Expr *parseDefine();
-    Expr *parseAssign();
     Expr *parseCondition();
     Expr *parseIF();
-    Expr *parseInstructions();
     Expr *parseElif();
     Expr *parseElse();
     Expr *parseCompoundCondition();
     Expr *parseLoop();
+    Expr *parseAssign();
     Expr *parseExpression();  // Expression Grammar
     Expr *parseTerm();
     Expr *parseFactor();
