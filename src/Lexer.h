@@ -31,8 +31,8 @@ public:
         mod_equal,
         minus,
         minus_equal,
-        and,
-        or,
+        AND,
+        OR,
         power,
         gt,    // >
         gte,   // >=
@@ -42,20 +42,20 @@ public:
         mul_equal,
         slash,
         slash_equal,
-        if,
-        elif,
-        else,
+        IF,
+        ELIF,
+        ELSE,
         loopc,      // exclamation
         l_paren,
         r_paren,
         KW_int
     };
 
+
 private:
     TokenKind Kind;
     llvm::StringRef Text; // points to the start of the text of the token
 
-public:
     TokenKind getKind() const { return Kind; }
     llvm::StringRef getText() const { return Text; }
 

@@ -53,7 +53,7 @@ namespace
     }
 
     // Visit function for the GSM node in the AST.
-    virtual void visit(GSM &Node) override
+    virtual void visit(Goal &Node) override
     {
       // Iterate over the children of the GSM node and visit each child.
       for (auto I = Node.begin(), E = Node.end(); I != E; ++I)
@@ -137,7 +137,7 @@ namespace
       // Perform the binary operation based on the operator type and create the corresponding instruction.
       switch (Node.getOperator())
       {
-      case Equation::Plus:
+      case Equation::Operator::Plus:
         V = Builder.CreateNSWAdd(Left, Right);
         break;
       case Equation::Minus:
@@ -150,8 +150,8 @@ namespace
         V = Builder.CreateSDiv(Left, Right);
         break;
       case Equation:: power:
-        V=1;
-      for (int i = 0; i < Right.getVal().getAsInteger(10); i++)
+        V=Left;
+      for (int i = 0; i < Right.getVal().getAsInteger(10)-1; i++)
         V = Builder.CreateNSWMul(V,Left);
         break;
       case Equation:: mod:
@@ -162,14 +162,14 @@ namespace
       }
     };
 
-    virtual void visit(Declaration &Node) override
+    virtual void visit(Define &Node) override
     {
       Value *val = nullptr;
 
-      if (Node.getExpr())
+      if (Node.getVars())
       {
         // If there is an expression provided, visit it and get its value.
-        Node.getExpr()->accept(*this);
+        Node.getVars()->accept(*this);
         val = V;
       }
 

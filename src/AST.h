@@ -20,6 +20,7 @@ class Define;
 class Condition;
 class CompOp;
 class Loop;
+class Expression;
 class Equation;
 class Final;
 
@@ -187,6 +188,35 @@ public:
   }
 };
 
+class Expression : public Expr
+{
+public:
+  enum Operator
+  {
+    Plus,
+    Minus,
+  };
+
+private:
+  Expr *Left;                               // Left-hand side expression
+  Expr *Right;                              // Right-hand side expression
+  Operator Op;                              // Operator of the binary operation
+
+public:
+  Expression(Operator Op, Expr *L, Expr *R) : Op(Op), Left(L), Right(R) {}
+
+  Expr *getLeft() { return Left; }
+
+  Expr *getRight() { return Right; }
+
+  Operator getOperator() { return Op; }
+
+  virtual void accept(ASTVisitor &V) override
+  {
+    V.visit(*this);
+  }
+};
+
 class CompOp : public Expr
 {
 public:
@@ -227,19 +257,22 @@ public:
 class Define : public Expr
 {
   using VarVector = llvm::SmallVector<llvm::StringRef, 8>;
-  VarVector Vars;                           // Stores the list of variables
-  VarVector ExprVector;
+  VarVector vars, exprs;
 
 public:
-  Define(llvm::SmallVector<llvm::StringRef, 8> Vars, VarVector ExprVector) : Vars(Vars), ExprVector(ExprVector) {}
+  Define(llvm::SmallVector<llvm::StringRef, 8> Vars, VarVector ExprVector) : Vars(Vars), exprs(exprs) {}
 
-  VarVector::const_iterator begin() { return Vars.begin(); }
+  llvm::SmallVector<llvm::StringRef, 8> getVars() { return vars; }
 
-  VarVector::const_iterator end() { return Vars.end(); }
+  llvm::SmallVector<llvm::StringRef, 8> getExprs() { return exprs; }
 
-  VarVector::const_iterator final_begin() { return ExprVector.begin(); }
+  VarVector::const_iterator begin() { return vars.begin(); }
+
+  VarVector::const_iterator end() { return vars.end(); }
+
+  VarVector::const_iterator final_begin() { return exprs.begin(); }
   
-  VarVector::const_iterator final_end() { return ExprVector.end(); }
+  VarVector::const_iterator final_end() { return exprs.end(); }
 
   virtual void accept(ASTVisitor &V) override
   {

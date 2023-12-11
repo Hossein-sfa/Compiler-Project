@@ -53,15 +53,15 @@ void Lexer::next(Token &token)
         else if (Name == "end")
             kind = Token::End;
         else if (Name == "and")
-            kind = Token::and;
+            kind = Token::AND;
         else if (Name == "or")
-            kind = Token:: or ;
+            kind = Token::OR ;
         else if (Name == "if")
-            kind = Token::if;
+            kind = Token::IF;
         else if (Name == "elif")
-            kind = Token::elif;
+            kind = Token::ELIF;
         else if (Name == "else")
-            kind = Token::else;
+            kind = Token::ELSE;
         else if (Name == "loopc")
             kind = Token::loopc;
         else
