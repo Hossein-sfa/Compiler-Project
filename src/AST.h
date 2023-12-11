@@ -13,16 +13,15 @@
 // class Assignment;
 // class Declaration;
 
-class AST();
-class Goal();
-class Expr();
-class Define();
-class Assign();
-class Condition();
-class CompOp();
-class Loop();
-class Equation();
-class Final(); // TODO: ops
+class AST;
+class Goal;
+class Expr;
+class Define;
+class Condition;
+class CompOp;
+class Loop;
+class Equation;
+class Final;
 
 // ASTVisitor class defines a visitor pattern to traverse the AST
 class ASTVisitor
@@ -31,12 +30,13 @@ public:
   // Virtual visit functions for each AST node type
   virtual void visit(AST &) {}               // Visit the base AST node
   virtual void visit(Expr &) {}              // Visit the expression node
-  virtual void visit(GSM &) = 0;             // Visit the group of expressions node
-  virtual void visit(Factor &) = 0;          // Visit the factor node
-  virtual void visit(BinaryOp &) = 0;        // Visit the binary operation node
-  virtual void visit(Assignment &) = 0;      // Visit the assignment expression node
-  virtual void visit(Declaration &) = 0;     // Visit the variable declaration node
-  //TODO
+  virtual void visit(Goal &) = 0;             // Visit the group of expressions node       
+  virtual void visit(Equation &) = 0;        // Visit the binary operation node
+  virtual void visit(Define &) = 0;      // Visit the assignment expression node
+  virtual void visit(Final &) = 0;     // Visit the variable declaration node
+  virtual void visit(Loop &) = 0;  
+  virtual void visit(CompOp &) = 0;
+  virtual void visit(Condition &) = 0;
 };
 
 // AST class serves as the base class for all AST nodes
@@ -94,45 +94,6 @@ public:
   ValueKind getKind() { return Kind; }
 
   llvm::StringRef getVal() { return Val; }
-
-  virtual void accept(ASTVisitor &V) override
-  {
-    V.visit(*this);
-  }
-};
-
-// BinaryOp class represents a binary operation in the AST (plus, minus, multiplication, division)
-class Equation : public Expr
-{
-public:
-  enum Operator
-  {
-    Plus,
-    Minus,
-    Mul,
-    Div,
-    power,
-    mod,
-    minus_equal,
-    plus_equal,
-    slash_equal,
-    mod_equal,
-    mul_equal,
-  };
-
-private:
-  Expr *Left;                               // Left-hand side expression
-  Expr *Right;                              // Right-hand side expression
-  Operator Op;                              // Operator of the binary operation
-
-public:
-  Equation(Operator Op, Expr *L, Expr *R) : Op(Op), Left(L), Right(R) {}
-
-  Expr *getLeft() { return Left; }
-
-  Expr *getRight() { return Right; }
-
-  Operator getOperator() { return Op; }
 
   virtual void accept(ASTVisitor &V) override
   {
