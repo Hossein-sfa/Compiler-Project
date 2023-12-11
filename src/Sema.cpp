@@ -31,8 +31,8 @@ public:
   };
 
   // Visit function for Factor nodes
-  virtual void visit(Factor &Node) override {
-    if (Node.getKind() == Factor::Ident) {
+  virtual void visit(Final &Node) override {
+    if (Node.getKind() == Final::Id) {
       // Check if identifier is in the scope
       if (Scope.find(Node.getVal()) == Scope.end())
         error(Not, Node.getVal());
@@ -40,7 +40,7 @@ public:
   };
 
   // Visit function for BinaryOp nodes
-  virtual void visit(BinaryOp &Node) override {
+  virtual void visit(Equation &Node) override {
     if (Node.getLeft())
       Node.getLeft()->accept(*this);
     else
@@ -68,17 +68,17 @@ public:
   };
 
   // Visit function for Assignment nodes
-  virtual void visit(Assignment &Node) override {
+  virtual void visit(Equation &Node) override {
     Factor *dest = Node.getLeft();
 
     dest->accept(*this);
 
-    if (dest->getKind() == Factor::Number) {
+    if (dest->getKind() == Final::Number) {
         llvm::errs() << "Assignment destination must be an identifier.";
         HasError = true;
     }
 
-    if (dest->getKind() == Factor::Ident) {
+    if (dest->getKind() == Final::Id) {
       // Check if the identifier is in the scope
       if (Scope.find(dest->getVal()) == Scope.end())
         error(Not, dest->getVal());
@@ -88,7 +88,7 @@ public:
       Node.getRight()->accept(*this);
   };
 
-  virtual void visit(Declaration &Node) override {
+  virtual void visit(Define &Node) override {
     for (auto I = Node.begin(), E = Node.end(); I != E;
          ++I) {
       if (!Scope.insert(*I).second)
