@@ -62,50 +62,33 @@ namespace
       }
     };
 
+    virtual void visit(Condition &Node) override
+    {
+      // Visit the left-hand side of the binary operation and get its value.
+      Node.getVars()->accept(*this);
+      Value *Left = V;
+
+      // Visit the right-hand side of the binary operation and get its value.
+      Node.getEquations()->accept(*this);
+      Value *Right = V;
+    };
+
+    virtual void visit(Loop &Node) override
+    {
+      // Visit the left-hand side of the binary operation and get its value.
+      Node.getExprs()->accept(*this);
+
+      // Visit the right-hand side of the binary operation and get its value.
+      Node.getConditions()->accept(*this);
+    };
+
     virtual void visit(Equation &Node) override
     {
       // Visit the left-hand side of the binary operation and get its value.
       Node.getLeft()->accept(*this);
-      Value *Left = V;
 
       // Visit the right-hand side of the binary operation and get its value.
       Node.getRight()->accept(*this);
-      Value *Right = V;
-      {
-        case Equation::minus_equal:
-          V = Builder.CreateSDiv(Left, Right);
-          break;
-        case Equation::plus_equal:
-          V = Builder.CreateSDiv(Left, Right);
-          break;
-        case Equation::equal:
-          V = Builder.CreateSDiv(Left, Right);
-          break;
-        case Equation::mul_equal:
-          V = Builder.CreateSDiv(Left, Right);
-          break;
-        case Equation::slash_equal:
-          V = Builder.CreateSDiv(Left, Right);
-          break;
-        case Equation:: mod_equal:
-          V = Builder.CreateSDiv(Left, Right);
-          break;
-      }
-
-      // Get the name of the variable being assigned.
-      auto varName = Node.getLeft()->getVal();
-
-      // Create a store instruction to assign the value to the variable.
-      Builder.CreateStore(val, nameMap[varName]);
-
-      // Create a function type for the "gsm_write" function.
-      FunctionType *CalcWriteFnTy = FunctionType::get(VoidTy, {Int32Ty}, false);
-
-      // Create a function declaration for the "gsm_write" function.
-      Function *CalcWriteFn = Function::Create(CalcWriteFnTy, GlobalValue::ExternalLinkage, "gsm_write", M);
-
-      // Create a call instruction to invoke the "gsm_write" function with the value.
-      CallInst *Call = Builder.CreateCall(CalcWriteFnTy, CalcWriteFn, {val});
     };
 
     virtual void visit(Final &Node) override
@@ -137,28 +120,23 @@ namespace
       // Perform the binary operation based on the operator type and create the corresponding instruction.
       switch (Node.getOperator())
       {
-      case Equation::Operator::Plus:
+      case Equation::Plus:
         V = Builder.CreateNSWAdd(Left, Right);
         break;
       case Equation::Minus:
         V = Builder.CreateNSWSub(Left, Right);
         break;
-      case Equation::Mul:
-        V = Builder.CreateNSWMul(Left, Right);
+      case Equation::power:
+        V = Left;
+        int intval;
+        Right.getVal().getAsInteger(10, intval);
+        for (int i = 0; i < intval - 1; i++)
+          V = Builder.CreateNSWMul(V, Left);
         break;
-      case Equation::Div:
-        V = Builder.CreateSDiv(Left, Right);
-        break;
-      case Equation:: power:
-        V=Left;
-      for (int i = 0; i < Right.getVal().getAsInteger(10)-1; i++)
-        V = Builder.CreateNSWMul(V,Left);
-        break;
-      case Equation:: mod:
-        V
-        int l=Right.getVal().getAsInteger(10)
-        V = Builder.(Left, Right);
-        break;
+        //     case Equation:: mod:
+        //       int l=Right.getVal().getAsInteger(10);
+        //      V = Builder(Left, Right);
+        //      break;
       }
     };
 
@@ -188,19 +166,23 @@ namespace
         }
       }
     };
+
+    virtual void visit(Term &Node) override{};
+
+    virtual void visit(Factor &Node) override{};
   };
-}; // namespace
+  }; // namespace
 
-void CodeGen::compile(AST *Tree)
-{
-  // Create an LLVM context and a module.
-  LLVMContext Ctx;
-  Module *M = new Module("calc.expr", Ctx);
+  void CodeGen::compile(AST *Tree)
+  {
+    // Create an LLVM context and a module.
+    LLVMContext Ctx;
+    Module *M = new Module("calc.expr", Ctx);
 
-  // Create an instance of the ToIRVisitor and run it on the AST to generate LLVM IR.
-  ToIRVisitor ToIR(M);
-  ToIR.run(Tree);
+    // Create an instance of the ToIRVisitor and run it on the AST to generate LLVM IR.
+    ToIRVisitor ToIR(M);
+    ToIR.run(Tree);
 
-  // Print the generated module to the standard output.
-  M->print(outs(), nullptr);
-}
+    // Print the generated module to the standard output.
+    M->print(outs(), nullptr);
+  }

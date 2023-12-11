@@ -51,7 +51,7 @@ void Lexer::next(Token &token)
         else if (Name == "begin")
             kind = Token::begin;
         else if (Name == "end")
-            kind = Token::End;
+            kind = Token::end;
         else if (Name == "and")
             kind = Token::AND;
         else if (Name == "or")
@@ -87,37 +87,37 @@ void Lexer::next(Token &token)
         llvm::StringRef Name(BufferPtr, end - BufferPtr);
         Token::TokenKind kind;
         if (Name == "+") {
-            if (end == '=')
+            if (end == "=")
                 kind = Token::plus_equal;
             else
                 kind = Token::plus;
         } else if (Name == "-") {
-            if (end == '=')
+            if (end == "=")
                 kind = Token::minus_equal;
             else
                 kind = Token::minus;
         } else if (Name == "*") {
-            if (end == '=')
+            if (end == "=")
                 kind = Token::mul_equal;
             else
                 kind = Token::mul;
         } else if (Name == "/") {
-            if (end == '=')
+            if (end == "=")
                 kind = Token::slash_equal;
             else
                 kind = Token::slash;
         } else if (Name == ">") {
-            if (end == '=')
+            if (end == "=")
                 kind = Token::gte;
             else
                 kind = Token::gt;
         } else if (Name == "<") {
-            if (end == '=')
+            if (end == "=")
                 kind = Token::lte;
             else
                 kind = Token::lt;
         } else if (Name == "!") {
-            if (end == '=')
+            if (end == "=")
                 kind = Token::not_equal;
             else
                 kind = Token::unknown;
@@ -134,7 +134,7 @@ void Lexer::next(Token &token)
         } else if (Name == ",")
             kind = Token::comma;
         else if (Name == ";")
-            kind = Token::semicolon
+            kind = Token::semicolon;
         else if (Name == ":")
             kind = Token::colon;
         else if (Name == "^")
@@ -146,7 +146,7 @@ void Lexer::next(Token &token)
         else
             kind = Token::unknown;
 
-        if (isDoubleOperation(Name) && end == '=')
+        if (charinfo::isDoubleOperation(Name[0]) && end == "=")
             end++;
         // generate the token
         formToken(token, end, kind);

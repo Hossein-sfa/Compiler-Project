@@ -55,7 +55,7 @@ public:
 private:
     TokenKind Kind;
     llvm::StringRef Text; // points to the start of the text of the token
-
+public:
     TokenKind getKind() const { return Kind; }
     llvm::StringRef getText() const { return Text; }
 
