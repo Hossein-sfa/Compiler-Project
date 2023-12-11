@@ -37,7 +37,7 @@ public:
         gt,    // >
         gte,   // >=
         lt,    // <
-        lte    // <=
+        lte,    // <=
         mul,
         mul_equal,
         slash,
@@ -48,7 +48,7 @@ public:
         loopc,      // exclamation
         l_paren,
         r_paren,
-        KW_int,
+        KW_int
     };
 
 private:

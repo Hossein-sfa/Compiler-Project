@@ -223,26 +223,6 @@ public:
   }
 };
 
-// Assignment class represents an assignment expression in the AST
-class Assignment : public Expr
-{
-private:
-  Factor *Left;                             // Left-hand side factor (identifier)
-  Expr *Right;                              // Right-hand side expression
-
-public:
-  Assignment(Factor *L, Expr *R) : Left(L), Right(R) {}
-
-  Factor *getLeft() { return Left; }
-
-  Expr *getRight() { return Right; }
-
-  virtual void accept(ASTVisitor &V) override
-  {
-    V.visit(*this);
-  }
-};
-
 // Declaration class represents a variable declaration with an initializer in the AST
 class Define : public Expr
 {
@@ -257,7 +237,9 @@ public:
 
   VarVector::const_iterator end() { return Vars.end(); }
 
-  Expr *getExpr() { return E; }
+  VarVector::const_iterator final_begin() { return ExprVector.begin(); }
+  
+  VarVector::const_iterator final_end() { return ExprVector.end(); }
 
   virtual void accept(ASTVisitor &V) override
   {
