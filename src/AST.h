@@ -8,7 +8,7 @@
 // class AST;
 // class Expr;
 // class GSM;
-// class Factor;
+// class Final;
 // class BinaryOp;
 // class Assignment;
 // class Define;
@@ -90,8 +90,8 @@ public:
     Number
   };
   private:
-  ValueKind Kind;                            // Stores the kind of factor (identifier or number)
-  llvm::StringRef Val;                       // Stores the value of the factor
+  ValueKind Kind;                            // Stores the kind of Final (identifier or number)
+  llvm::StringRef Val;                       // Stores the value of the Final
 
 public:
   Final(ValueKind Kind, llvm::StringRef Val) : Kind(Kind), Val(Val) {}
@@ -288,13 +288,13 @@ public:
 class Assignment : public Expr
 {
 private:
-    Factor *Left; // Left-hand side factor (identifier)
+    Final *Left; // Left-hand side Final (identifier)
     Expr *Right;  // Right-hand side expression
 
 public:
-    Assignment(Factor *L, Expr *R) : Left(L), Right(R) {}
+    Assignment(Final *L, Expr *R) : Left(L), Right(R) {}
 
-    Factor *getLeft() { return Left; }
+    Final *getLeft() { return Left; }
 
     Expr *getRight() { return Right; }
 
