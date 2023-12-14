@@ -4,14 +4,14 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
 
-// Forward declarations of classes used in the AST
+// Forward Defines of classes used in the AST
 // class AST;
 // class Expr;
 // class GSM;
 // class Factor;
 // class BinaryOp;
 // class Assignment;
-// class Declaration;
+// class Define;
 
 class AST;
 class Goal;
@@ -24,7 +24,6 @@ class Expression;
 class Term;
 class BinaryOp;
 class Final;
-class Factor;
 
 // ASTVisitor class defines a visitor pattern to traverse the AST
 class ASTVisitor
@@ -36,12 +35,11 @@ public:
   virtual void visit(Goal &) = 0;             // Visit the group of expressions node       
   virtual void visit(BinaryOp &) = 0;        // Visit the binary operation node
   virtual void visit(Define &) = 0;      // Visit the assignment expression node
-  virtual void visit(Final &) = 0;     // Visit the variable declaration node
+  virtual void visit(Final &) = 0;     // Visit the variable Define node
   virtual void visit(Loop &) = 0;  
   virtual void visit(Condition &) = 0;
   virtual void visit(Expression &) = 0;
   virtual void visit(Term &) = 0;
-  virtual void visit(Factor &) = 0;
   virtual void visit(IF &) = 0;
 };
 
@@ -306,7 +304,7 @@ public:
     }
 };
 
-// Declaration class represents a variable declaration with an initializer in the AST
+// Define class represents a variable Define with an initializer in the AST
 class Define : public Expr
 {
   using VarVector = llvm::SmallVector<llvm::StringRef, 8>;
