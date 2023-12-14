@@ -111,12 +111,12 @@ class Condition : public Expr
 {
 
     using ExprVector = llvm::SmallVector<Expr *>;
-    using BEVector = llvm::SmallVector<IF *>;
+    using IFVector = llvm::SmallVector<IF *>;
 
 
 private:
     ExprVector exprs; // Stores the list of expressions
-    BEVector Assignments;   // Stores the list of Assignments
+    IFVector Assignments;   // Stores the list of Assignments
 
 public:
     Condition(llvm::SmallVector<Expr *> exprs, llvm::SmallVector<IF *> Assignments) : exprs(exprs), Assignments(Assignments) {}
