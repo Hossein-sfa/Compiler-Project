@@ -110,7 +110,7 @@ Expr *Parser::parseCondition()
     Expr *E1, *E2, *_IF;
     llvm::SmallVector<llvm::StringRef, 8> Vars;
     if (!Tok.is(Token::IF))
-        goto _error;
+        goto _error3;
 
     advance();
     E1 = parseCondition();
