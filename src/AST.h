@@ -23,7 +23,7 @@ class CompOp;
 class Loop;
 class Expression;
 class Term;
-class Equation;
+class BinaryOp;
 class Final;
 class Factor;
 
@@ -35,7 +35,7 @@ public:
   virtual void visit(AST &) {}               // Visit the base AST node
   virtual void visit(Expr &) {}              // Visit the expression node
   virtual void visit(Goal &) = 0;             // Visit the group of expressions node       
-  virtual void visit(Equation &) = 0;        // Visit the binary operation node
+  virtual void visit(BinaryOp &) = 0;        // Visit the binary operation node
   virtual void visit(Define &) = 0;      // Visit the assignment expression node
   virtual void visit(Final &) = 0;     // Visit the variable declaration node
   virtual void visit(Loop &) = 0;  
