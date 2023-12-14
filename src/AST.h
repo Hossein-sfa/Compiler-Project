@@ -24,7 +24,6 @@ class Expression;
 class Term;
 class BinaryOp;
 class Final;
-class Factor;
 
 // ASTVisitor class defines a visitor pattern to traverse the AST
 class ASTVisitor
@@ -41,7 +40,6 @@ public:
   virtual void visit(Condition &) = 0;
   virtual void visit(Expression &) = 0;
   virtual void visit(Term &) = 0;
-  virtual void visit(Factor &) = 0;
   virtual void visit(IF &) = 0;
 };
 
