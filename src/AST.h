@@ -18,6 +18,7 @@ class Goal;
 class Expr;
 class Define;
 class Condition;
+class IF;
 class CompOp;
 class Loop;
 class Expression;
@@ -41,8 +42,9 @@ public:
   virtual void visit(CompOp &) = 0;
   virtual void visit(Condition &) = 0;
   virtual void visit(Expression &) = 0;
-virtual void visit(Term &) = 0;
-virtual void visit(Factor &) = 0;
+  virtual void visit(Term &) = 0;
+  virtual void visit(Factor &) = 0;
+  virtual void visit(IF &) = 0;
 };
 
 // AST class serves as the base class for all AST nodes
@@ -133,7 +135,28 @@ public:
   }
 };
 
-class Equation : public Expr
+class IF : public Expr
+{
+
+    using ExprVector = llvm::SmallVector<Expr *>;
+
+private:
+    ExprVector assigns; // Stores the list of expressions
+
+public:
+    IF(llvm::SmallVector<Expr *> assigns) : assigns(assigns) {}
+
+    ExprVector::const_iterator begin() { return assigns.begin(); }
+
+    ExprVector::const_iterator end() { return assigns.end(); }
+
+    virtual void accept(ASTVisitor &V) override
+    {
+        V.visit(*this);
+    }
+};
+
+class BinaryOp : public Expr
 {
 public:
   enum Operator
@@ -150,6 +173,8 @@ public:
     mod_equal,
     mul_equal,
     equal,
+    AND,
+    OR
   };
 
 private:
@@ -158,7 +183,7 @@ private:
   Operator Op;                              // Operator of the binary operation
 
 public:
-  Equation(Operator Op, Expr *L, Expr *R) : Op(Op), Left(L), Right(R) {}
+  BinaryOp(Operator Op, Expr *L, Expr *R) : Op(Op), Left(L), Right(R) {}
 
   Expr *getLeft() { return Left; }
 
@@ -291,6 +316,25 @@ public:
   {
     V.visit(*this);
   }
+};
+
+class Equation : public Expr
+{
+private:
+    Factor *Left; // Left-hand side factor (identifier)
+    Expr *Right;  // Right-hand side expression
+
+public:
+    Assignment(Factor *L, Expr *R) : Left(L), Right(R) {}
+
+    Factor *getLeft() { return Left; }
+
+    Expr *getRight() { return Right; }
+
+    virtual void accept(ASTVisitor &V) override
+    {
+        V.visit(*this);
+    }
 };
 
 // Declaration class represents a variable declaration with an initializer in the AST
