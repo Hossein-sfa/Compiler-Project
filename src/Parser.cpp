@@ -204,7 +204,7 @@ Expr *Parser::parseCompoundCondition()
     
     return new CompoundCondition(equations);
 
- _error4: 
+ _error5: 
     while (Tok.getKind() != Token::eoi)
         advance();
     return nullptr;
@@ -218,21 +218,21 @@ Expr *Parser::parseLoop()
     IF *I;
     llvm::SmallVector<llvm::StringRef, 8> equations;
     if (!Tok.is(Token::loopc))
-        goto _error;
+        goto _error6;
 
     advance();
 
     C = parseCompoundCondition();
 
     if (expect(Token::colon))
-        goto _error5;
+        goto _error6;
     advance();
 
     I = (IF*)(parseIF());
 
     return new Loop(C, I);
 
-_error5: 
+_error6: 
     while (Tok.getKind() != Token::eoi)
         advance();
     return nullptr;
@@ -256,13 +256,13 @@ Expr *Parser::parseEquation()
     E = parseExpr();
 
     if (expect(Token::semicolon))
-        goto _error6;
+        goto _error7;
 
     advance();
 
     return new Assignment(F, E);
     
-_error6: 
+_error7: 
         while (Tok.getKind() != Token::eoi)
             advance();
         return nullptr;
@@ -312,12 +312,12 @@ Expr *Parser::parseEquation()
 {
     Expr *E;
     if (!Tok.is(Token::id))
-        goto _error7;
+        goto _error8;
 
     advance();
 
     if (!Tok.isOneOf(Token::minus_equal, Token::mul_equal, Token::plus_equal, Token::slash_equal, Token::mod_equal, Token::equal))
-        goto _error7;
+        goto _error8;
         
     advance();
 
@@ -327,18 +327,18 @@ Expr *Parser::parseEquation()
         E = parseExpression();
         if (!Tok.is(Token::r_paren))
         {
-            goto _error7;
+            goto _error8;
         }
         advance();
     }
     else
     {
-        goto _error7;
+        goto _error8;
     }
     
     return new Equation(E);
 
- _error7:
+ _error8:
         while (Tok.getKind() != Token::eoi)
             advance();
         return nullptr;
@@ -353,7 +353,7 @@ Expr *Parser::parseFinal()
         E = parseExpression();
         if (!Tok.is(Token::r_paren))
         {
-            goto _error;
+            goto _error9;
         }
         advance();
     } 
@@ -363,8 +363,13 @@ Expr *Parser::parseFinal()
     }
     else
     {
-        goto _error;
+        goto _error9;
     }
     
     return Final(E);
+
+ _error9:
+        while (Tok.getKind() != Token::eoi)
+            advance();
+        return nullptr;
 }
