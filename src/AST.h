@@ -18,11 +18,11 @@ class Goal;
 class Expr;
 class Define;
 class Condition;
-class CompOp;
+class IF;
 class Loop;
 class Expression;
 class Term;
-class Equation;
+class BinaryOp;
 class Final;
 class Factor;
 
@@ -34,15 +34,15 @@ public:
   virtual void visit(AST &) {}               // Visit the base AST node
   virtual void visit(Expr &) {}              // Visit the expression node
   virtual void visit(Goal &) = 0;             // Visit the group of expressions node       
-  virtual void visit(Equation &) = 0;        // Visit the binary operation node
+  virtual void visit(BinaryOp &) = 0;        // Visit the binary operation node
   virtual void visit(Define &) = 0;      // Visit the assignment expression node
   virtual void visit(Final &) = 0;     // Visit the variable declaration node
   virtual void visit(Loop &) = 0;  
-  virtual void visit(CompOp &) = 0;
   virtual void visit(Condition &) = 0;
   virtual void visit(Expression &) = 0;
-virtual void visit(Term &) = 0;
-virtual void visit(Factor &) = 0;
+  virtual void visit(Term &) = 0;
+  virtual void visit(Factor &) = 0;
+  virtual void visit(IF &) = 0;
 };
 
 // AST class serves as the base class for all AST nodes
@@ -114,14 +114,14 @@ class Condition : public Expr
   using ExprVector = llvm::SmallVector<Expr *>;
 
 private:
-  ExprVector exprs, equations;        
+  ExprVector exprs, Assignments;        
 
 public:
-  Condition(ExprVector exprs, ExprVector equations) : exprs(exprs), equations(equations) {}
+  Condition(ExprVector exprs, ExprVector Assignments) : exprs(exprs), Assignments(Assignments) {}
 
   llvm::SmallVector<Expr *> getVars() { return exprs; }
 
-  llvm::SmallVector<Expr *> getEquations() { return equations; }
+  llvm::SmallVector<Expr *> getAssignments() { return Assignments; }
 
   ExprVector::const_iterator begin() { return exprs.begin(); }
 
@@ -133,7 +133,28 @@ public:
   }
 };
 
-class Equation : public Expr
+class IF : public Expr
+{
+
+    using ExprVector = llvm::SmallVector<Expr *>;
+
+private:
+    ExprVector assigns; // Stores the list of expressions
+
+public:
+    IF(llvm::SmallVector<Expr *> assigns) : assigns(assigns) {}
+
+    ExprVector::const_iterator begin() { return assigns.begin(); }
+
+    ExprVector::const_iterator end() { return assigns.end(); }
+
+    virtual void accept(ASTVisitor &V) override
+    {
+        V.visit(*this);
+    }
+};
+
+class BinaryOp : public Expr
 {
 public:
   enum Operator
@@ -150,6 +171,14 @@ public:
     mod_equal,
     mul_equal,
     equal,
+    AND,
+    OR,
+    lte,
+    gte,
+    is_equal,
+    not_equal,
+    gt,
+    lt
   };
 
 private:
@@ -158,7 +187,7 @@ private:
   Operator Op;                              // Operator of the binary operation
 
 public:
-  Equation(Operator Op, Expr *L, Expr *R) : Op(Op), Left(L), Right(R) {}
+  BinaryOp(Operator Op, Expr *L, Expr *R) : Op(Op), Left(L), Right(R) {}
 
   Expr *getLeft() { return Left; }
 
@@ -172,41 +201,6 @@ public:
   }
 };
 
-class CompOp : public Expr
-{
-public:
-  enum Operator
-  {
-    lte,
-    gte,
-    is_equal,
-    not_equal,
-    gt,
-    lt,
-  };
-
-private:
-  Expr *Left;                               // Left-hand side expression
-  Expr *Right;                              // Right-hand side expression
-  Operator Op;    
-  Expr * IF;                          // Operator of the binary operation
-
-public:
-  CompOp(Operator Op, Expr *L, Expr *R, Expr *I) : Op(Op), Left(L), Right(R), IF(I) {}
-
-  Expr *getLeft() { return Left; }
-
-  Expr *getRight() { return Right; }
-
-  Expr *getIF() { return IF; }
-
-  Operator getOperator() { return Op; }
-
-  virtual void accept(ASTVisitor &V) override
-  {
-    V.visit(*this);
-  }
-};
 
 // loopc
 class Loop : public Expr
@@ -291,6 +285,25 @@ public:
   {
     V.visit(*this);
   }
+};
+
+class Assignment : public Expr
+{
+private:
+    Factor *Left; // Left-hand side factor (identifier)
+    Expr *Right;  // Right-hand side expression
+
+public:
+    Assignment(Factor *L, Expr *R) : Left(L), Right(R) {}
+
+    Factor *getLeft() { return Left; }
+
+    Expr *getRight() { return Right; }
+
+    virtual void accept(ASTVisitor &V) override
+    {
+        V.visit(*this);
+    }
 };
 
 // Declaration class represents a variable declaration with an initializer in the AST

@@ -1,20 +1,16 @@
 Goal -> (Expr;)*
 
-Expr -> Define | Equation | Condition | Loop
+Expr -> Define | Assignment | Condition | Loop
 
 Define -> int ID(, ID)* | int ID(, ID)* = Expression(, Expression)*
 
-Condition -> if (Expression) (CompOp) (Expression): IF
+Condition -> (if) (Expression) (CompOp) (Expression): (IF) ((elif) (C): IF)* ((else): IF)
 
-IF-> begin (Equation)+ end ((Elif)* |(Elif)* Else)
-
-Elif -> elif C : begin (Equation;)* end
-
-Else -> else : begin (Equation;)* end
+IF-> begin (Assignment)+ end 
 
 C -> Expression ((and | or) Expression)*
 
-Loop -> loopc C : begin (Equation;)* end
+Loop -> loopc C : begin (Assignment;)* end
 
 ID -> (a-z | A-Z)+
 
@@ -28,7 +24,7 @@ Num -> 0 | (1-9)((0-9))* | -(1-9)((0-9))*
 
 Op -> -= | += | *= | \= | %= | =
 
-Equation -> (ID) (Op) (Expression)
+Assignment -> (ID) (Op) (Expression)
 
 CompOp -> (<= | >= | == | != | > | <)
 

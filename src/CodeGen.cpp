@@ -53,119 +53,15 @@ namespace
     }
 
     // Visit function for the GSM node in the AST.
-    virtual void visit(Goal &Node) override
-    {
-      // Iterate over the children of the GSM node and visit each child.
-      for (auto I = Node.begin(), E = Node.end(); I != E; ++I)
-      {
-        (*I)->accept(*this);
-      }
-    };
+    virtual void visit(Goal &Node) override {};
 
-    virtual void visit(Condition &Node) override
-    {
-      // Visit the left-hand side of the binary operation and get its value.
-      Node.getVars()->accept(*this);
-      Value *Left = V;
+    virtual void visit(Condition &Node) override{};
 
-      // Visit the right-hand side of the binary operation and get its value.
-      Node.getEquations()->accept(*this);
-      Value *Right = V;
-    };
+    virtual void visit(Assignment &Node) override {};
 
-    virtual void visit(Loop &Node) override
-    {
-      // Visit the left-hand side of the binary operation and get its value.
-      Node.getExprs()->accept(*this);
+    virtual void visit(Expression &Node) override {};
 
-      // Visit the right-hand side of the binary operation and get its value.
-      Node.getConditions()->accept(*this);
-    };
-
-    virtual void visit(Equation &Node) override
-    {
-      // Visit the left-hand side of the binary operation and get its value.
-      Node.getLeft()->accept(*this);
-
-      // Visit the right-hand side of the binary operation and get its value.
-      Node.getRight()->accept(*this);
-    };
-
-    virtual void visit(Final &Node) override
-    {
-      if (Node.getKind() == Final::Id)
-      {
-        // If the factor is an identifier, load its value from memory.
-        V = Builder.CreateLoad(Int32Ty, nameMap[Node.getVal()]);
-      }
-      else
-      {
-        // If the factor is a literal, convert it to an integer and create a constant.
-        int intval;
-        Node.getVal().getAsInteger(10, intval);
-        V = ConstantInt::get(Int32Ty, intval, true);
-      }
-    };
-
-    virtual void visit(Expression &Node) override
-    {
-      // Visit the left-hand side of the binary operation and get its value.
-      Node.getLeft()->accept(*this);
-      Value *Left = V;
-
-      // Visit the right-hand side of the binary operation and get its value.
-      Node.getRight()->accept(*this);
-      Value *Right = V;
-
-      // Perform the binary operation based on the operator type and create the corresponding instruction.
-      switch (Node.getOperator())
-      {
-      case Equation::Plus:
-        V = Builder.CreateNSWAdd(Left, Right);
-        break;
-      case Equation::Minus:
-        V = Builder.CreateNSWSub(Left, Right);
-        break;
-      case Equation::power:
-        V = Left;
-        int intval;
-        Right.getVal().getAsInteger(10, intval);
-        for (int i = 0; i < intval - 1; i++)
-          V = Builder.CreateNSWMul(V, Left);
-        break;
-        //     case Equation:: mod:
-        //       int l=Right.getVal().getAsInteger(10);
-        //      V = Builder(Left, Right);
-        //      break;
-      }
-    };
-
-    virtual void visit(Define &Node) override
-    {
-      Value *val = nullptr;
-
-      if (Node.getVars())
-      {
-        // If there is an expression provided, visit it and get its value.
-        Node.getVars()->accept(*this);
-        val = V;
-      }
-
-      // Iterate over the variables declared in the declaration statement.
-      for (auto I = Node.begin(), E = Node.end(); I != E; ++I)
-      {
-        StringRef Var = *I;
-
-        // Create an alloca instruction to allocate memory for the variable.
-        nameMap[Var] = Builder.CreateAlloca(Int32Ty);
-
-        // Store the initial value (if any) in the variable's memory location.
-        if (val != nullptr)
-        {
-          Builder.CreateStore(val, nameMap[Var]);
-        }
-      }
-    };
+    virtual void visit(Define &Node) override {};
 
     virtual void visit(Term &Node) override{};
 

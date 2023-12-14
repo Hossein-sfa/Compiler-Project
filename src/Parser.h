@@ -57,7 +57,7 @@ class Parser
     Expr *parseExpression();  // Expression Grammar
     Expr *parseTerm();
     Expr *parseFactor();
-    Expr *parseEquation();
+    Expr *parseAssignment();
     Expr *parseFinal();
 
 public:
