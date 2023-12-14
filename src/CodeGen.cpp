@@ -263,7 +263,7 @@ namespace
       {
         count_exprs++;
       }
-      for (auto I = Node.Assignments_begin(), E = Node.Assignments_end(); I != E; ++I)
+      for (auto I = Node.assignments_begin(), E = Node.assignments_end(); I != E; ++I)
       {
         count_Assignments++;
       }
