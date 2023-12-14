@@ -19,7 +19,6 @@ class Expr;
 class Define;
 class Condition;
 class IF;
-class CompOp;
 class Loop;
 class Expression;
 class Term;
@@ -39,7 +38,6 @@ public:
   virtual void visit(Define &) = 0;      // Visit the assignment expression node
   virtual void visit(Final &) = 0;     // Visit the variable declaration node
   virtual void visit(Loop &) = 0;  
-  virtual void visit(CompOp &) = 0;
   virtual void visit(Condition &) = 0;
   virtual void visit(Expression &) = 0;
   virtual void visit(Term &) = 0;
@@ -174,7 +172,13 @@ public:
     mul_equal,
     equal,
     AND,
-    OR
+    OR,
+    lte,
+    gte,
+    is_equal,
+    not_equal,
+    gt,
+    lt
   };
 
 private:
@@ -197,41 +201,6 @@ public:
   }
 };
 
-class CompOp : public Expr
-{
-public:
-  enum Operator
-  {
-    lte,
-    gte,
-    is_equal,
-    not_equal,
-    gt,
-    lt,
-  };
-
-private:
-  Expr *Left;                               // Left-hand side expression
-  Expr *Right;                              // Right-hand side expression
-  Operator Op;    
-  Expr * IF;                          // Operator of the binary operation
-
-public:
-  CompOp(Operator Op, Expr *L, Expr *R, Expr *I) : Op(Op), Left(L), Right(R), IF(I) {}
-
-  Expr *getLeft() { return Left; }
-
-  Expr *getRight() { return Right; }
-
-  Expr *getIF() { return IF; }
-
-  Operator getOperator() { return Op; }
-
-  virtual void accept(ASTVisitor &V) override
-  {
-    V.visit(*this);
-  }
-};
 
 // loopc
 class Loop : public Expr
