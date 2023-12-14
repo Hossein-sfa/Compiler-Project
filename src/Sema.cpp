@@ -95,7 +95,7 @@ public:
         error(Twice, *I); // If the insertion fails (element already exists in Scope), report a "Twice" error
     }
     if (Node.getExpr())
-      Node.getExpr()->accept(*this); // If the Declaration node has an expression, recursively visit the expression node
+      Node.getExpr()->accept(*this); // If the Define node has an expression, recursively visit the expression node
   };
 };
 }
