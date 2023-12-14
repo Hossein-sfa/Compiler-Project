@@ -109,48 +109,34 @@ public:
 // IF ELSE ELIF Compound condition
 class Condition : public Expr
 {
-  using ExprVector = llvm::SmallVector<Expr *>;
-
-private:
-  ExprVector exprs, Assignments;        
-
-public:
-  Condition(ExprVector exprs, ExprVector Assignments) : exprs(exprs), Assignments(Assignments) {}
-
-  llvm::SmallVector<Expr *> getVars() { return exprs; }
-
-  llvm::SmallVector<Expr *> getAssignments() { return Assignments; }
-
-  ExprVector::const_iterator begin() { return exprs.begin(); }
-
-  ExprVector::const_iterator end() { return exprs.end(); }
-
-  virtual void accept(ASTVisitor &V) override
-  {
-    V.visit(*this);
-  }
-};
-
-class IF : public Expr
-{
 
     using ExprVector = llvm::SmallVector<Expr *>;
+    using BEVector = llvm::SmallVector<BE *>;
+
 
 private:
-    ExprVector assigns; // Stores the list of expressions
+    ExprVector exprs; // Stores the list of expressions
+    BEVector Assignments;   // Stores the list of Assignments
 
 public:
-    IF(llvm::SmallVector<Expr *> assigns) : assigns(assigns) {}
+    Condition(llvm::SmallVector<Expr *> exprs, llvm::SmallVector<BE *> Assignments) : exprs(exprs), Assignments(Assignments) {}
 
-    ExprVector::const_iterator begin() { return assigns.begin(); }
+    ExprVector::const_iterator exprs_begin() { return exprs.begin(); }
 
-    ExprVector::const_iterator end() { return assigns.end(); }
+    ExprVector::const_iterator exprs_end() { return exprs.end(); }
+
+    llvm::SmallVector<BE *> getAllAssignments() { return Assignments; }
+
+    BEVector::const_iterator Assignments() { return Assignments.begin(); }
+
+    BEVector::const_iterator Assignments() { return Assignments.end(); }
 
     virtual void accept(ASTVisitor &V) override
     {
         V.visit(*this);
     }
 };
+
 
 class BinaryOp : public Expr
 {
