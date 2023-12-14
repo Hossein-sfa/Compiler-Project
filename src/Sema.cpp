@@ -40,7 +40,7 @@ public:
   };
 
   // Visit function for BinaryOp nodes
-  virtual void visit(Equation &Node) override {
+  virtual void visit(Assignment &Node) override {
     if (Node.getLeft())
       Node.getLeft()->accept(*this);
     else
@@ -68,7 +68,7 @@ public:
   };
 
   // Visit function for Assignment nodes
-  virtual void visit(Equation &Node) override {
+  virtual void visit(Assignment &Node) override {
     Factor *dest = Node.getLeft();
 
     dest->accept(*this);

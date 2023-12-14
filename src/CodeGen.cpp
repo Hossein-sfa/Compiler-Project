@@ -69,7 +69,7 @@ namespace
       Value *Left = V;
 
       // Visit the right-hand side of the binary operation and get its value.
-      Node.getEquations()->accept(*this);
+      Node.getAssignments()->accept(*this);
       Value *Right = V;
     };
 
@@ -82,7 +82,7 @@ namespace
       Node.getConditions()->accept(*this);
     };
 
-    virtual void visit(Equation &Node) override
+    virtual void visit(Assignment &Node) override
     {
       // Visit the left-hand side of the binary operation and get its value.
       Node.getLeft()->accept(*this);
@@ -120,20 +120,20 @@ namespace
       // Perform the binary operation based on the operator type and create the corresponding instruction.
       switch (Node.getOperator())
       {
-      case Equation::Plus:
+      case Assignment::Plus:
         V = Builder.CreateNSWAdd(Left, Right);
         break;
-      case Equation::Minus:
+      case Assignment::Minus:
         V = Builder.CreateNSWSub(Left, Right);
         break;
-      case Equation::power:
+      case Assignment::power:
         V = Left;
         int intval;
         Right.getVal().getAsInteger(10, intval);
         for (int i = 0; i < intval - 1; i++)
           V = Builder.CreateNSWMul(V, Left);
         break;
-        //     case Equation:: mod:
+        //     case Assignment:: mod:
         //       int l=Right.getVal().getAsInteger(10);
         //      V = Builder(Left, Right);
         //      break;

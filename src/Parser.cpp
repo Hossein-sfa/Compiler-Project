@@ -26,7 +26,7 @@ AST *Parser::parseGoal()
         if (Tok.is(Token::id))
         {
             Expr *d;
-            d = parseEquation();
+            d = parseAssignment();
             if (!Tok.is(Token::semicolon))
             {
                 error();
@@ -140,7 +140,7 @@ Expr *Parser::parseCondition()
 
 Expr *Parser::parseIF()
 {
-    Equation *E;
+    Assignment *E;
     llvm::SmallVector<Expr *> assigns;
     if (expect(Token::begin))
     {
@@ -151,7 +151,7 @@ Expr *Parser::parseIF()
 
     while (Tok.is(Token::id))
     {
-        E = (Equation *)parseAssign();
+        E = (Assignment *)parseAssign();
         Factor *f = E->getLeft();
         Factor *t = (Factor *)E->getRight();
         if (E)
@@ -193,7 +193,7 @@ Expr *Parser::parseCompoundCondition()
         advance();
         if (!expect(Token::id))
             goto _error5;
-        equations.push_back(Tok.getText());
+        Assignments.push_back(Tok.getText());
         advance();
     }
     
@@ -202,7 +202,7 @@ Expr *Parser::parseCompoundCondition()
         goto _error5;
     }
     
-    return new CompoundCondition(equations);
+    return new CompoundCondition(Assignments);
 
  _error5: 
     while (Tok.getKind() != Token::eoi)
@@ -216,7 +216,7 @@ Expr *Parser::parseLoop()
 {
     Expr *C;
     IF *I;
-    llvm::SmallVector<llvm::StringRef, 8> equations;
+    llvm::SmallVector<llvm::StringRef, 8> Assignments;
     if (!Tok.is(Token::loopc))
         goto _error6;
 
@@ -238,7 +238,7 @@ _error6:
     return nullptr;
 }
 
-Expr *Parser::parseEquation()
+Expr *Parser::parseAssignment()
 {
     Expr *E;
     Factor *F;
@@ -291,7 +291,7 @@ Expr *Parser::parseTerm()
             Tok.is(Token::mul) ? BinaryOp::Mul : (Tok.is(Token::mod? BinaryOp::mod:BinaryOp::Div));
         advance();
         Expr *Right = parseFactor();
-        Left = new Equation(Op, Left, Right);
+        Left = new Assignment(Op, Left, Right);
     }
     return Left;
 }
@@ -308,7 +308,7 @@ Expr *Parser::parseFactor()
     return Left;
 }
 
-Expr *Parser::parseEquation()
+Expr *Parser::parseAssignment()
 {
     Expr *E;
     if (!Tok.is(Token::id))
@@ -336,7 +336,7 @@ Expr *Parser::parseEquation()
         goto _error8;
     }
     
-    return new Equation(E);
+    return new Assignment(E);
 
  _error8:
         while (Tok.getKind() != Token::eoi)

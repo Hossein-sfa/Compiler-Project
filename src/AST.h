@@ -114,14 +114,14 @@ class Condition : public Expr
   using ExprVector = llvm::SmallVector<Expr *>;
 
 private:
-  ExprVector exprs, equations;        
+  ExprVector exprs, Assignments;        
 
 public:
-  Condition(ExprVector exprs, ExprVector equations) : exprs(exprs), equations(equations) {}
+  Condition(ExprVector exprs, ExprVector Assignments) : exprs(exprs), Assignments(Assignments) {}
 
   llvm::SmallVector<Expr *> getVars() { return exprs; }
 
-  llvm::SmallVector<Expr *> getEquations() { return equations; }
+  llvm::SmallVector<Expr *> getAssignments() { return Assignments; }
 
   ExprVector::const_iterator begin() { return exprs.begin(); }
 
@@ -287,7 +287,7 @@ public:
   }
 };
 
-class Equation : public Expr
+class Assignment : public Expr
 {
 private:
     Factor *Left; // Left-hand side factor (identifier)
