@@ -127,9 +127,9 @@ public:
 
     llvm::SmallVector<IF*> getAllAssignments() { return assignments; }
 
-    IFVector::const_iterator Assignments() { return assignments.begin(); }
+    IFVector::const_iterator assignments_begin() { return assignments.begin(); }
 
-    IFVector::const_iterator Assignments() { return assignments.end(); }
+    IFVector::const_iterator assignments_end() { return assignments.end(); }
 
     virtual void accept(ASTVisitor &V) override
     {
