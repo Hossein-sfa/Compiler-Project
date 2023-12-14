@@ -80,22 +80,22 @@ namespace
       FunctionType *CalcWriteFnTy = FunctionType::get(VoidTy, {Int32Ty}, false);
 
       // Create a function Define for the "gsm_write" function.
-      Function *CalcWriteFn = Function::Create(CalcWriteFnTy, GlobalValue::ExternalLinkage, "gsm_write", M);
+      Function *CalcWriteFn = Function::Create(CalcWriteFnTy, GlobalValue::ExternalLinkage, "goal_write", M);
 
       // Create a call instruction to invoke the "gsm_write" function with the value.
       CallInst *Call = Builder.CreateCall(CalcWriteFnTy, CalcWriteFn, {val});
     };
 
-    virtual void visit(Factor &Node) override
+    virtual void visit(Final &Node) override
     {
-      if (Node.getKind() == Factor::Id)
+      if (Node.getKind() == Final::Id)
       {
-        // If the factor is an identifier, load its value from memory.
+        // If the final is an identifier, load its value from memory.
         V = Builder.CreateLoad(Int32Ty, nameMap[Node.getVal()]);
       }
       else
       {
-        // If the factor is a literal, convert it to an integer and create a constant.
+        // If the final is a literal, convert it to an integer and create a constant.
         int intval;
         Node.getVal().getAsInteger(10, intval);
         V = ConstantInt::get(Int32Ty, intval, true);
@@ -130,12 +130,10 @@ namespace
       case BinaryOp::power:
       {
         V = Left;
-        Factor *f = (Factor *)Right;
+        Final *f = (Final *)Right;
         int temp;
         f->getVal().getAsInteger(10, temp);
-        // llvm::errs() << temp
-        //      << " :: " << f->getVal();
-        if (f && f->getKind() == Factor::ValueKind::Number){
+        if (f && f->getKind() == Final::ValueKind::Number){
           int right_value_as_int;
           f->getVal().getAsInteger(10, right_value_as_int);
           if(right_value_as_int == 0)
@@ -254,7 +252,6 @@ namespace
     virtual void visit(Condition &Node) override
     {
 
-      // Our code
       Value *val = nullptr;
       int count_exprs = 0;
       int count_Assignments = 0;
@@ -290,16 +287,15 @@ namespace
 
         }
       }
-      // else
       if (count_Assignments + 1 == count_exprs)
       {
         auto Assignmentse = Node.Assignments_end();
         (*Assignmentse)->accept(*this);
       }
-      // if(endOfCondition)
+    
     };
   };
-}; // namespace
+}; 
 
 void CodeGen::compile(AST *Tree)
 {
