@@ -116,20 +116,20 @@ class Condition : public Expr
 
 private:
     ExprVector exprs; // Stores the list of expressions
-    IFVector Assignments;   // Stores the list of Assignments
+    IFVector assignments;   // Stores the list of Assignments
 
 public:
-    Condition(llvm::SmallVector<Expr *> exprs, llvm::SmallVector<IF *> Assignments) : exprs(exprs), Assignments(Assignments) {}
+    Condition(llvm::SmallVector<Expr *> exprs, llvm::SmallVector<IF *> assignments) : exprs(exprs), assignments(assignments) {}
 
     ExprVector::const_iterator exprs_begin() { return exprs.begin(); }
 
     ExprVector::const_iterator exprs_end() { return exprs.end(); }
 
-    llvm::SmallVector<IF*> getAllAssignments() { return Assignments; }
+    llvm::SmallVector<IF*> getAllAssignments() { return assignments; }
 
-    IFVector::const_iterator Assignments() { return Assignments.begin(); }
+    IFVector::const_iterator Assignments() { return assignments.begin(); }
 
-    IFVector::const_iterator Assignments() { return Assignments.end(); }
+    IFVector::const_iterator Assignments() { return assignments.end(); }
 
     virtual void accept(ASTVisitor &V) override
     {
