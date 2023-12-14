@@ -111,7 +111,7 @@ class Condition : public Expr
 {
 
     using ExprVector = llvm::SmallVector<Expr *>;
-    using BEVector = llvm::SmallVector<BE *>;
+    using BEVector = llvm::SmallVector<IF *>;
 
 
 private:
@@ -119,17 +119,17 @@ private:
     BEVector Assignments;   // Stores the list of Assignments
 
 public:
-    Condition(llvm::SmallVector<Expr *> exprs, llvm::SmallVector<BE *> Assignments) : exprs(exprs), Assignments(Assignments) {}
+    Condition(llvm::SmallVector<Expr *> exprs, llvm::SmallVector<IF *> Assignments) : exprs(exprs), Assignments(Assignments) {}
 
     ExprVector::const_iterator exprs_begin() { return exprs.begin(); }
 
     ExprVector::const_iterator exprs_end() { return exprs.end(); }
 
-    llvm::SmallVector<BE *> getAllAssignments() { return Assignments; }
+    llvm::SmallVector<IF*> getAllAssignments() { return Assignments; }
 
-    BEVector::const_iterator Assignments() { return Assignments.begin(); }
+    IFVector::const_iterator Assignments() { return Assignments.begin(); }
 
-    BEVector::const_iterator Assignments() { return Assignments.end(); }
+    IFVector::const_iterator Assignments() { return Assignments.end(); }
 
     virtual void accept(ASTVisitor &V) override
     {
