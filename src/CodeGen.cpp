@@ -179,7 +179,6 @@ namespace
     virtual void visit(Define &Node) override
     {
 
-      // Our code
       bool hasValue = false;
       auto e_I = Node.begin_values(), e_E = Node.end_values();
       // Iterate over the variables declared in the Define statement.
@@ -190,7 +189,7 @@ namespace
         // Create an alloca instruction to allocate memory for the variable.
         nameMap[Var] = Builder.CreateAlloca(Int32Ty);
         
-        if (e_I != e_E) // star or not ? 
+        if (e_I != e_E) 
         {
           (* e_I)->accept(*this);
 
