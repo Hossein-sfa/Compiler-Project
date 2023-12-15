@@ -143,7 +143,7 @@ class IF : public Expr
     using ExprVector = llvm::SmallVector<Assignment *>;
 
 private:
-    ExprVector assigns; // Stores the list of expressions
+    ExprVector assignments; // Stores the list of expressions
 
 public:
    IF(llvm::SmallVector<Assignment *> assignments) : assignments(assignments) {}
