@@ -23,7 +23,7 @@ public:
   bool hasError() { return HasError; } // Function to check if an error occurred
 
   // Visit function for GSM nodes
-  virtual void visit(GSM &Node) override { 
+  virtual void visit(Goal &Node) override { 
     for (auto I = Node.begin(), E = Node.end(); I != E; ++I)
     {
       (*I)->accept(*this); // Visit each child node

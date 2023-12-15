@@ -210,27 +210,20 @@ public:
 // loopc
 class Loop : public Expr
 {
-  using ExprVector = llvm::SmallVector<Expr *>;
-
-private:
-  llvm::SmallVector<llvm::StringRef, 8> conditions;
-  ExprVector exprs;
+    Expr *E; 
+    IF *F;   
 
 public:
-  Loop(llvm::SmallVector<llvm::StringRef, 8> conditions, ExprVector exprs) : conditions(conditions), exprs(exprs) {}
+    Loop(Expr *E, IF *F) : E(E), F(F) {}
 
-  llvm::SmallVector<Expr *> getExprs() { return exprs; }
+    Expr *getExprs() { return E; }
 
-  llvm::SmallVector<llvm::StringRef, 8> getConditions() { return conditions; }
+    IF *getIF() { return F; }
 
-  ExprVector::const_iterator begin() { return exprs.begin(); }
-
-  ExprVector::const_iterator end() { return exprs.end(); }
-
-  virtual void accept(ASTVisitor &V) override
-  {
-    V.visit(*this);
-  }
+    virtual void accept(ASTVisitor &V) override
+    {
+        V.visit(*this);
+    }
 };
 
 class Expression : public Expr
