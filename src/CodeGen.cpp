@@ -266,7 +266,7 @@ namespace
       {
         count_Assignments++;
       }
-      BE* Assignments_I = *(Node.getAllAssignments().begin()), *Assignments_E = *(Node.getAllAssignments().end());
+      IF* Assignments_I = *(Node.getAllAssignments().begin()), *Assignments_E = *(Node.getAllAssignments().end());
       for (auto I = Node.exprs_begin(), E = Node.exprs_begin(); I != E; ++I, ++Assignments_I)
       {
     
