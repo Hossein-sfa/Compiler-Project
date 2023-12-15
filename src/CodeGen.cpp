@@ -232,7 +232,7 @@ namespace
 
       Builder.CreateBr(WhileCondBB);
       Builder.SetInsertPoint(WhileCondBB);
-      Node.getExpr()->accept(*this);
+      Node.getExprs()->accept(*this);
       Value* val=V;
       Builder.CreateCondBr(val, WhileBodyBB, AfterWhileBB);
       Builder.SetInsertPoint(WhileBodyBB);

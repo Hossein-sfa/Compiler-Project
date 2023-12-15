@@ -140,20 +140,17 @@ public:
 class IF : public Expr
 {
 
-    using ExprVector = llvm::SmallVector<Assignment *>;
+    using ExprVector = llvm::SmallVector<Expr *>;
 
 private:
     ExprVector assignments; // Stores the list of expressions
 
 public:
-   IF(llvm::SmallVector<Assignment *> assignments) : assignments(assignments) {}
+   IF(llvm::SmallVector<Expr *> assignments) : assignments(assignments) {}
 
     ExprVector::const_iterator begin() { return assignments.begin(); }
 
     ExprVector::const_iterator end() { return assignments.end(); }
-
-    llvm::SmallVector<Assignment *> getAssignment() { return assignments; }
-
 
     virtual void accept(ASTVisitor &V) override
     {
