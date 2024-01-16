@@ -1,0 +1,1 @@
+extern std::vector<std::string> lives;
