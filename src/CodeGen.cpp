@@ -122,14 +122,14 @@ namespace
         bool flag = false;
         for (auto variable : lives)
         {
-          if ( std::to_string(intval) == variable)
+          if (std::to_string(intval) == variable)
           {
             flag = true;
             break;
           }
         }
         if (!flag)
-        V = ConstantInt::get(Int32Ty, intval, true);
+          V = ConstantInt::get(Int32Ty, intval, true);
       }
     };
 
@@ -157,22 +157,22 @@ namespace
       // }
       // if (!flag && !flag2){
 
-        // Perform the binary operation based on the op}erator type and create the corresponding instruction.
-        switch (Node.getOperator())
-        {
-        case BinaryOp::Plus:
-          V = Builder.CreateNSWAdd(Left, Right);
-          break;
-        case BinaryOp::Minus:
-          V = Builder.CreateNSWSub(Left, Right);
-          break;
-        case BinaryOp::Mul:
-          V = Builder.CreateNSWMul(Left, Right);
-          break;
-        case BinaryOp::Div:
-          V = Builder.CreateSDiv(Left, Right);
-          break;
-        }
+      // Perform the binary operation based on the op}erator type and create the corresponding instruction.
+      switch (Node.getOperator())
+      {
+      case BinaryOp::Plus:
+        V = Builder.CreateNSWAdd(Left, Right);
+        break;
+      case BinaryOp::Minus:
+        V = Builder.CreateNSWSub(Left, Right);
+        break;
+      case BinaryOp::Mul:
+        V = Builder.CreateNSWMul(Left, Right);
+        break;
+      case BinaryOp::Div:
+        V = Builder.CreateSDiv(Left, Right);
+        break;
+      }
     };
 
     virtual void visit(Declaration &Node) override

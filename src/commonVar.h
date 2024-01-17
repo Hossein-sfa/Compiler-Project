@@ -1,1 +1,3 @@
-extern std::vector<std::string> lives;
+#include <set>
+
+extern std::set <std::string> lives;

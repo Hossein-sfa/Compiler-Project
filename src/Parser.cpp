@@ -4,12 +4,12 @@
 #include <iostream>
 #include <map>
 #include <stack>
+#include <set>
 
-std::vector <std::string> tokens;
-std::map <std::string, std::vector<std::string>> dependant;
-std::vector<std::string> lives;
-std::vector <std::string> my_stack;
-
+std::vector<std::string> tokens;
+std::map<std::string, std::vector<std::string>> dependant;
+std::vector<std::string> my_stack;
+std::set<std::string> lives;
 
 // main point is that the whole input has been consumed
 AST *Parser::parse()
@@ -32,12 +32,12 @@ AST *Parser::parseGSM()
                 exprs.push_back(d);
             else
                 goto _error2;
-	    tokens.push_back(";");
+            tokens.push_back(";");
             break;
         case Token::ident:
             Expr *a;
             a = parseAssign();
-	   
+
             if (!Tok.is(Token::semicolon))
             {
                 error();
@@ -56,15 +56,18 @@ AST *Parser::parseGSM()
         advance(); // TODO: watch this part
     }
 
-    while (tokens.size()) {
+    while (tokens.size())
+    {
         std::string current = tokens.front();
-        std::vector <std::string> dependencies;
+        std::vector<std::string> dependencies;
         std::string variable;
         variable = tokens.front();
         tokens.erase(tokens.begin());
-        tokens.erase(tokens.begin());
+        if (tokens.front() != ";")
+            tokens.erase(tokens.begin());
         current = tokens.front();
-        while (current != ";") {
+        while (current != ";")
+        {
             dependencies.push_back(current);
             tokens.erase(tokens.begin());
             current = tokens.front();
@@ -72,14 +75,17 @@ AST *Parser::parseGSM()
         tokens.erase(tokens.begin());
         dependant[variable] = dependencies;
     }
-	
+
+    my_stack = std::vector<std::string>();
     my_stack.push_back("result");
-    
-    while (1) {
+
+    while (1)
+    {
         std::string current = my_stack.back();
         my_stack.pop_back();
-        lives.push_back(current);
-        for (auto i : dependant[current]) {
+        lives.insert(current);
+        for (auto i : dependant[current])
+        {
             my_stack.push_back(i);
         }
         if (!my_stack.size())
@@ -88,7 +94,6 @@ AST *Parser::parseGSM()
 
     for (auto i : lives)
         std::cout << i << " ";
-
 
     return new GSM(exprs);
 _error2:
@@ -118,21 +123,20 @@ Expr *Parser::parseDec()
         advance();
         if (expect(Token::ident))
             goto _error;
-        //To Do
+        // To Do
         Vars.push_back(Tok.getText());
         advance();
     }
 
     if (Tok.isOneOf(Token::equal, Token::semicolon))
     {
-	    if (Tok.is(Token::equal)){
+        if (Tok.is(Token::equal))
+        {
             advance();
             tokens.push_back("=");
-	    }
+        }
         E = parseExpr();
     }
-    
-    
 
     if (expect(Token::semicolon))
         goto _error;
@@ -191,7 +195,6 @@ Expr *Parser::parseTerm()
 
 Expr *Parser::parseFactor()
 {
-
     Expr *Res = nullptr;
     std::string str = "0";
     Res = new Factor(Factor::Number, llvm::StringRef(str));
@@ -199,7 +202,7 @@ Expr *Parser::parseFactor()
     {
     case Token::number:
         Res = new Factor(Factor::Number, Tok.getText());
-	tokens.push_back(Tok.getText().str());
+        tokens.push_back(Tok.getText().str());
         advance();
         break;
     case Token::ident:
