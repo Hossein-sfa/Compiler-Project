@@ -199,16 +199,16 @@ namespace
             break;
           }
         }
-        if (!flag)
-          continue;
-
-        // Create an alloca instruction to allocate memory for the variable.
-        nameMap[Var] = Builder.CreateAlloca(Int32Ty);
-
-        // Store the initial value (if any) in the variable's memory location.
-        if (val != nullptr)
+        if (flag)
         {
-          Builder.CreateStore(val, nameMap[Var]);
+          // Create an alloca instruction to allocate memory for the variable.
+          nameMap[Var] = Builder.CreateAlloca(Int32Ty);
+
+          // Store the initial value (if any) in the variable's memory location.
+          if (val != nullptr)
+          {
+            Builder.CreateStore(val, nameMap[Var]);
+          }
         }
       }
     };
